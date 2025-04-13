@@ -608,8 +608,6 @@ const GuestProfileAnalytics = ({ timeRange }) => {
               <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Conversion Impact</h4>
               <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-2">
                 <li><span className="font-medium">Return Rate:</span> {dummyData.photoContestData.conversionData.returnRate}% of participants returned for future events</li>
-                <li><span className="font-medium">Social Media Shares:</span> {dummyData.photoContestData.conversionData.sharedOnSocialMedia} photos shared on social platforms</li>
-                <li><span className="font-medium">Referral Visits:</span> {dummyData.photoContestData.conversionData.socialMediaReferrals} new customers from social shares</li>
               </ul>
             </div>
           </div>
@@ -1023,28 +1021,6 @@ const GuestProfileAnalytics = ({ timeRange }) => {
           <div className="mt-4 text-sm text-gray-600 dark:text-gray-300">
             <p className="font-medium">Key Insight:</p>
             <p>67% of tickets are purchased within 3 days of the event.</p>
-          </div>
-        </div>
-
-        {/* Customer Lifetime Value */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Customer Lifetime Value by Segment</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={dummyData.customerLifetimeValue.byFrequency} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="segment" />
-              <YAxis />
-              <Tooltip formatter={(value) => [formatCurrency(value), 'CLV']} />
-              <Bar dataKey="value" name="Lifetime Value" fill="#8884d8">
-                {dummyData.customerLifetimeValue.byFrequency.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-          <div className="mt-4 text-sm text-gray-600 dark:text-gray-300">
-            <p className="font-medium">Key Insight:</p>
-            <p>VIP customers represent 13.7x more value than one-time visitors.</p>
           </div>
         </div>
 

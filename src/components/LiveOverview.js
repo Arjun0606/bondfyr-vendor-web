@@ -62,7 +62,6 @@ const dummyData = {
   peakTimeAnalysis: {
     entryPeak: '22:00-23:00',
     orderPeak: '20:00-21:00',
-    estimatedStayDuration: '3.5 hours',
     estimatedTurnover: '45%'
   },
   guestList: {
@@ -492,16 +491,6 @@ const LiveOverview = () => {
             <div className="space-y-2">
               <p className="text-sm text-gray-500 dark:text-gray-400">Order Peak</p>
               <p className="text-lg font-semibold text-gray-900 dark:text-white">{dummyData.peakTimeAnalysis.orderPeak}</p>
-            </div>
-            <div className="space-y-2">
-              <p className="text-sm text-gray-500 dark:text-gray-400">Estimated Stay Duration</p>
-              <p className="text-lg font-semibold text-gray-900 dark:text-white">{dummyData.peakTimeAnalysis.estimatedStayDuration}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">(Based on historical data)</p>
-            </div>
-            <div className="space-y-2">
-              <p className="text-sm text-gray-500 dark:text-gray-400">Estimated Turnover</p>
-              <p className="text-lg font-semibold text-gray-900 dark:text-white">{dummyData.peakTimeAnalysis.estimatedTurnover}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">(Based on historical data)</p>
             </div>
           </div>
           <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">

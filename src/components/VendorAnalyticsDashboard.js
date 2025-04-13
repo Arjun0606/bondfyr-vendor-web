@@ -3,7 +3,6 @@ import { Tab } from '@headlessui/react';
 import GuestProfileAnalytics from './analytics/GuestProfileAnalytics';
 import TicketEntryAnalytics from './analytics/TicketEntryAnalytics';
 import PRReferralAnalytics from './analytics/PRReferralAnalytics';
-import VenueAnalytics from './analytics/VenueAnalytics';
 import SecurityAnalytics from './analytics/SecurityAnalytics';
 import PhotoContestAnalytics from './analytics/PhotoContestAnalytics';
 
@@ -18,7 +17,6 @@ const VendorAnalyticsDashboard = () => {
     { id: 'guest-profile', name: 'Guest Profiles', icon: '👥' },
     { id: 'ticket-entry', name: 'Ticket & Entry', icon: '🎟️' },
     { id: 'pr-referral', name: 'PR & Referrals', icon: '💰' },
-    { id: 'venue', name: 'Venue Analytics', icon: '🏢' },
     { id: 'security', name: 'Security', icon: '🔒' },
     { id: 'photo-contest', name: 'Photo Contest', icon: '📸' },
   ];
@@ -96,9 +94,6 @@ const VendorAnalyticsDashboard = () => {
             </Tab.Panel>
             <Tab.Panel className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow">
               <PRReferralAnalytics timeRange={timeRange} />
-            </Tab.Panel>
-            <Tab.Panel className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow">
-              <VenueAnalytics timeRange={timeRange} />
             </Tab.Panel>
             <Tab.Panel className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow">
               <SecurityAnalytics timeRange={timeRange} />
