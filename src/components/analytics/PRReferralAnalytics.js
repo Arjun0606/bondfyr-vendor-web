@@ -3,6 +3,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   PieChart, Pie, Cell, LineChart, Line, AreaChart, Area
 } from 'recharts';
+import { Link } from 'react-router-dom';
 
 // Dummy data for PR & Referral analytics
 const dummyData = {
@@ -86,6 +87,31 @@ const formatCurrency = (value) => {
 const PRReferralAnalytics = ({ timeRange }) => {
   return (
     <div className="space-y-6">
+      {/* Info box about Promoter Portal */}
+      <div className="p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-800 rounded-lg mb-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <svg className="w-5 h-5 text-purple-500 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.002z"></path>
+            </svg>
+            <div>
+              <p className="text-sm text-purple-700 dark:text-purple-300 font-medium">
+                Promoter Control Update
+              </p>
+              <p className="text-xs text-purple-600 dark:text-purple-400 mt-1">
+                PR code generation has been moved to the dedicated Promoter Portal. Promoters can now generate and manage their own codes.
+              </p>
+            </div>
+          </div>
+          <Link 
+            to="/promoter-portal"
+            className="px-3 py-1 text-xs text-white bg-purple-600 rounded hover:bg-purple-700 transition-colors duration-200"
+          >
+            Promoter Portal
+          </Link>
+        </div>
+      </div>
+
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">PR & Referral Analytics</h2>
         <span className="px-3 py-1 bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300 rounded-full text-sm font-medium">
@@ -101,7 +127,7 @@ const PRReferralAnalytics = ({ timeRange }) => {
             {dummyData.prStats.totalReferrals}
           </p>
           <p className="text-sm text-green-600 dark:text-green-400">
-            +18% from last month
+            +15% from last {timeRange}
           </p>
         </div>
 
@@ -111,7 +137,7 @@ const PRReferralAnalytics = ({ timeRange }) => {
             {dummyData.prStats.conversionRate}%
           </p>
           <p className="text-sm text-green-600 dark:text-green-400">
-            +4% from last month
+            +3% from last {timeRange}
           </p>
         </div>
 

@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import {
   LineChart,
   Line,
@@ -88,22 +86,6 @@ const GENDER_COLORS = {
   other: '#00C49F',
 };
 
-// Function to generate unique PR code with expiration
-const generatePRCode = (prName) => {
-  const timestamp = Date.now();
-  const expirationTime = timestamp + (36 * 60 * 60 * 1000); // 36 hours from now
-  const randomStr = Math.random().toString(36).substring(2, 5);
-  const prefix = prName.split(' ')[0].toUpperCase();
-  return {
-    code: `${prefix}-${timestamp.toString(36)}${randomStr}`,
-    createdAt: timestamp,
-    expiresAt: expirationTime,
-    isUsed: false,
-    usedAt: null,
-    usedBy: null
-  };
-};
-
 const LiveOverview = () => {
   const [timeRange, setTimeRange] = useState('today');
   const [prCodes, setPrCodes] = useState({});
@@ -115,59 +97,6 @@ const LiveOverview = () => {
       setPrCodes(JSON.parse(savedCodes));
     }
   }, []);
-
-  // Save PR codes to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem('prCodes', JSON.stringify(prCodes));
-  }, [prCodes]);
-
-  // Clean up expired codes every minute
-  useEffect(() => {
-    const cleanup = setInterval(() => {
-      const now = Date.now();
-      setPrCodes(prevCodes => {
-        const updatedCodes = Object.fromEntries(
-          Object.entries(prevCodes).map(([prName, codes]) => [
-            prName,
-            codes.filter(code => code.expiresAt > now)
-          ])
-        );
-        return updatedCodes;
-      });
-    }, 60000);
-
-    return () => clearInterval(cleanup);
-  }, []);
-
-  const handleGenerateCode = (prName) => {
-    const existingCodes = prCodes[prName] || [];
-    const activeCodes = existingCodes.filter(code => !code.isUsed && code.expiresAt > Date.now());
-
-    if (activeCodes.length >= 5) {
-      toast.warning('Maximum 5 active codes allowed per PR');
-      return;
-    }
-
-    const newCode = generatePRCode(prName);
-    setPrCodes(prev => ({
-      ...prev,
-      [prName]: [...(prev[prName] || []), newCode]
-    }));
-    toast.success('New PR code generated!');
-  };
-
-  const handleCopyCode = (code) => {
-    navigator.clipboard.writeText(code);
-    toast.success('Code copied to clipboard!');
-  };
-
-  const getTimeRemaining = (expiresAt) => {
-    const now = Date.now();
-    const remaining = expiresAt - now;
-    const hours = Math.floor(remaining / (1000 * 60 * 60));
-    const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-    return `${hours}h ${minutes}m`;
-  };
 
   return (
     <div className="space-y-6 bg-gray-100 dark:bg-gray-900 p-4">
@@ -249,37 +178,17 @@ const LiveOverview = () => {
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Hourly Check-ins</h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={dummyData.hourlyCheckins}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis 
-                dataKey="hour" 
-                stroke="#9CA3AF"
-                tick={{ fill: '#9CA3AF' }}
-              />
-              <YAxis 
-                stroke="#9CA3AF"
-                tick={{ fill: '#9CA3AF' }}
-              />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: '#1F2937',
-                  border: 'none',
-                  borderRadius: '0.5rem',
-                  color: '#F3F4F6'
-                }}
-                itemStyle={{ color: '#F3F4F6' }}
-              />
-              <Legend 
-                wrapperStyle={{
-                  color: '#9CA3AF'
-                }}
-              />
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="hour" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
               <Line 
                 type="monotone" 
                 dataKey="count" 
-                stroke="#60A5FA" 
+                stroke="#3B82F6" 
                 strokeWidth={2}
-                dot={{ r: 4, fill: '#60A5FA' }}
-                activeDot={{ r: 8, fill: '#3B82F6' }}
+                activeDot={{ r: 8 }}
                 animationDuration={1500}
               />
             </LineChart>
@@ -292,30 +201,25 @@ const LiveOverview = () => {
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
-                data={Object.entries(dummyData.genderRatio).map(([name, value]) => ({ name, value }))}
+                data={Object.entries(dummyData.genderRatio).map(([key, value]) => ({
+                  name: key,
+                  value,
+                }))}
                 cx="50%"
                 cy="50%"
-                innerRadius={60}
+                labelLine={false}
                 outerRadius={100}
                 fill="#8884d8"
                 dataKey="value"
-                label={({ name, value }) => `${name} (${value})`}
-                labelLine={false}
                 animationDuration={1500}
-                animationBegin={0}
+                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
               >
-                {Object.entries(dummyData.genderRatio).map(([name]) => (
-                  <Cell key={name} fill={GENDER_COLORS[name]} />
+                {Object.entries(dummyData.genderRatio).map(([key]) => (
+                  <Cell key={`cell-${key}`} fill={GENDER_COLORS[key]} />
                 ))}
               </Pie>
               <Tooltip
-                contentStyle={{
-                  backgroundColor: '#1F2937',
-                  border: 'none',
-                  borderRadius: '0.5rem',
-                  color: '#F3F4F6'
-                }}
-                itemStyle={{ color: '#F3F4F6' }}
+                formatter={(value, name) => [`${value} guests`, name.charAt(0).toUpperCase() + name.slice(1)]}
               />
               <Legend
                 wrapperStyle={{
@@ -327,9 +231,14 @@ const LiveOverview = () => {
         </div>
       </div>
 
-      {/* PR Performance */}
+      {/* PR Summary - Updated to remove code generation */}
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow hover:shadow-lg transition-all duration-300">
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">PR Performance</h3>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white">PR Performance</h3>
+          <a href="/promoter-analytics" className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+            View detailed analytics →
+          </a>
+        </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead>
@@ -347,7 +256,7 @@ const LiveOverview = () => {
                   Performance
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  PR Codes
+                  Active Codes
                 </th>
               </tr>
             </thead>
@@ -381,54 +290,27 @@ const LiveOverview = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                    <div className="flex flex-col space-y-2">
-                      <button
-                        onClick={() => handleGenerateCode(pr.name)}
-                        className="px-3 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition-colors duration-200"
-                      >
-                        Generate Code
-                      </button>
-                      {prCodes[pr.name]?.filter(code => code.expiresAt > Date.now()).map((codeData, idx) => (
-                        <div 
-                          key={codeData.code}
-                          className={`flex items-center justify-between space-x-2 ${
-                            codeData.isUsed ? 'bg-gray-200 dark:bg-gray-600' : 'bg-gray-100 dark:bg-gray-700'
-                          } px-2 py-1 rounded`}
-                          style={{
-                            animation: `fadeIn 0.3s ease-out ${idx * 0.1}s both`
-                          }}
-                        >
-                          <div className="flex items-center space-x-2">
-                            <span className="font-mono text-xs">{codeData.code}</span>
-                            {codeData.isUsed && (
-                              <span className="text-xs text-gray-500 dark:text-gray-400">
-                                (Used)
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <span className="text-xs text-gray-500 dark:text-gray-400">
-                              {getTimeRemaining(codeData.expiresAt)}
-                            </span>
-                            {!codeData.isUsed && (
-                              <button
-                                onClick={() => handleCopyCode(codeData.code)}
-                                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-                              >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                </svg>
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      ))}
+                    <div className="flex flex-wrap gap-2">
+                      {prCodes[pr.name]?.filter(code => !code.isUsed && code.expiresAt > Date.now()).length || 0} active
+                      {prCodes[pr.name]?.filter(code => code.isUsed && !code.checkedIn).length > 0 && (
+                        <span className="px-2 py-0.5 bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 rounded-full text-xs">
+                          {prCodes[pr.name]?.filter(code => code.isUsed && !code.checkedIn).length} pending
+                        </span>
+                      )}
                     </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+        </div>
+        <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+          <p className="text-xs text-blue-600 dark:text-blue-400 flex items-center">
+            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd"></path>
+            </svg>
+            PR code generation is now available in the dedicated Promoter Portal.
+          </p>
         </div>
       </div>
 
@@ -647,19 +529,6 @@ const LiveOverview = () => {
           </div>
         </div>
       </div>
-
-      <ToastContainer
-        position="bottom-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="dark"
-      />
 
       <style jsx>{`
         @keyframes fadeIn {
