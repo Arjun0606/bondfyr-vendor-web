@@ -1,3 +1,4 @@
+/* CSS for Promoter Portal QR code animations */
 /* QR Code animations */
 @keyframes sweep-horizontal {
   0% { transform: translateX(-100%); }
