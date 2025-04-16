@@ -14,83 +14,80 @@ const exampleVenueData = {
       gender: { male: 53, female: 45, other: 2 },
       age: { '18-24': 35, '25-34': 42, '35-44': 18, '45+': 5 }
     },
-    returningRate: 23
+    returningRate: 23,
+    checkInConversion: 82 // Percentage of RSVPs that actually check in
   },
-  revenue: {
-    total: 428500,
-    breakdown: {
-      tickets: 248000,
-      bar: 142500,
-      vipTables: 38000
+  checkins: {
+    byHour: {
+      '8pm': 105,
+      '9pm': 220,
+      '10pm': 390,
+      '11pm': 560,
+      '12am': 580,
+      '1am': 450,
+      '2am': 230,
+      '3am': 95
     },
-    averagePerGuest: 73.37
+    waitTimes: {
+      average: 8, // in minutes
+      peak: 15 // in minutes during busiest period
+    },
+    entryPoints: [
+      { name: 'Main', usage: 65 }, // percentage
+      { name: 'VIP', usage: 20 },
+      { name: 'Guest List', usage: 15 }
+    ],
+    appUsage: 76 // percentage of check-ins done via app
   },
   events: [
     { 
       name: 'Friday Night Live', 
       date: '2023-11-03', 
-      attendance: 420, 
-      revenue: 38500,
+      attendance: 420,
+      checkInRate: 85, // percentage of registered guests who checked in
       theme: 'Hip-hop'
     },
     { 
       name: 'Saturday Night Fever', 
       date: '2023-11-04', 
       attendance: 480, 
-      revenue: 42000,
+      checkInRate: 88,
       theme: 'EDM'
     },
     { 
       name: 'Midweek Madness', 
       date: '2023-11-08', 
       attendance: 340, 
-      revenue: 29500,
+      checkInRate: 78,
       theme: 'Open format'
     }
   ],
-  socialMedia: {
-    followers: {
-      instagram: 12400,
-      facebook: 8600,
-      twitter: 3200,
-      tiktok: 5800
-    },
-    growth: {
-      instagram: "+4.2%",
-      facebook: "-0.5%",
-      twitter: "+1.2%",
-      tiktok: "+7.8%"
-    },
-    engagement: {
-      rate: 4.8,
-      averageComments: 28,
-      averageLikes: 342,
-      averageShares: 16
-    },
-    contentPerformance: {
-      videos: { count: 12, averageEngagement: 3200, conversionRate: 2.4 },
-      images: { count: 32, averageEngagement: 840, conversionRate: 0.8 },
-      stories: { count: 48, averageEngagement: 620, conversionRate: 0.5 },
-      reels: { count: 8, averageEngagement: 2800, conversionRate: 1.9 }
-    },
-    topPosts: [
-      { type: 'video', engagement: 3200, theme: 'event-promo', platform: 'instagram' },
-      { type: 'image', engagement: 2800, theme: 'event-recap', platform: 'instagram' },
-      { type: 'reel', engagement: 4100, theme: 'behind-scenes', platform: 'tiktok' }
+  promoters: {
+    total: 15,
+    performance: [
+      { name: 'Alex', guests: 580, conversionRate: 89 },
+      { name: 'Jamie', guests: 490, conversionRate: 85 },
+      { name: 'Taylor', guests: 450, conversionRate: 92 },
+      { name: 'Jordan', guests: 310, conversionRate: 78 },
+      { name: 'Casey', guests: 280, conversionRate: 81 }
     ],
-    postingTimes: {
-      highestEngagement: { day: 'Thursday', time: '19:00-21:00' },
-      lowestEngagement: { day: 'Monday', time: '9:00-11:00' }
-    },
-    influencerCollabs: [
-      { name: 'DJ Maximus', followers: 45000, engagement: 2800, ticketSales: 42 },
-      { name: 'NightlifeQueen', followers: 28000, engagement: 1900, ticketSales: 28 }
-    ]
+    averageGuestsPerPromoter: 220,
+    topPromoterContribution: 45 // percentage of check-ins from top 3 promoters
   },
   operations: {
-    peakTimes: { entry: '11pm-12am', orders: '11:30pm-1am' },
+    peakTimes: { entry: '11pm-12am', exit: '2am-3am' },
     staffUtilization: 78,
-    commonBottlenecks: ['entry', 'main-bar']
+    staffDistribution: {
+      entry: 30, // percentage
+      security: 35,
+      service: 25,
+      management: 10
+    },
+    commonBottlenecks: ['entry', 'main-bar'],
+    checkInEquipment: {
+      scanners: 2,
+      avgProcessingTime: 45 // seconds per check-in
+    }
   }
 };
 
