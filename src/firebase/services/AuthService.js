@@ -5,9 +5,12 @@ import {
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
   updateProfile,
-  onAuthStateChanged
+  onAuthStateChanged,
+  deleteUser,
+  reauthenticateWithCredential,
+  EmailAuthProvider
 } from 'firebase/auth';
-import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { app, db } from '../firebase';
 
 // Define application roles
@@ -314,5 +317,68 @@ export class AuthService {
     const hasWebAccess = profile.apps?.web === true;
     
     return hasWebRole || hasWebAccess;
+  }
+  
+  /**
+   * Delete a user account
+   * @returns {Promise<void>}
+   */
+  static async deleteUserAccount() {
+    const user = this.getCurrentUser();
+    
+    if (!user) {
+      throw new Error('No authenticated user found');
+    }
+    
+    try {
+      // First delete the user's data from Firestore
+      const userDocRef = doc(db, 'users', user.uid);
+      
+      // Check if the document exists
+      const userDoc = await getDoc(userDocRef);
+      if (userDoc.exists()) {
+        await deleteDoc(userDocRef);
+      }
+      
+      // Then delete the user's authentication
+      await deleteUser(user);
+      
+      return true;
+    } catch (error) {
+      console.error('Error deleting user account:', error);
+      
+      // If the error is related to requiring recent login, throw a specific error
+      if (error.code === 'auth/requires-recent-login') {
+        throw new Error('For security reasons, please log out and sign in again before deleting your account');
+      }
+      
+      throw new Error(`Failed to delete account: ${error.message}`);
+    }
+  }
+  
+  /**
+   * Reauthenticate the user before sensitive operations
+   * @param {string} password - User's current password
+   * @returns {Promise<void>}
+   */
+  static async reauthenticateUser(password) {
+    const user = this.getCurrentUser();
+    
+    if (!user) {
+      throw new Error('No authenticated user found');
+    }
+    
+    if (!user.email) {
+      throw new Error('User has no email associated with their account');
+    }
+    
+    try {
+      const credential = EmailAuthProvider.credential(user.email, password);
+      await reauthenticateWithCredential(user, credential);
+      return true;
+    } catch (error) {
+      console.error('Reauthentication error:', error);
+      throw new Error(`Reauthentication failed: ${error.message}`);
+    }
   }
 } 
