@@ -29,6 +29,7 @@ import CampaignIcon from '@mui/icons-material/Campaign';
 import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import aiService from '../../services/aiService';
 import exampleVenueData from '../../data/exampleVenueData';
+import { useDataSource } from '../../context/DataSourceContext';
 
 const AIInsights = () => {
   const theme = useTheme();
@@ -39,6 +40,7 @@ const AIInsights = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [analysisStage, setAnalysisStage] = useState(0);
   const [progressMessage, setProgressMessage] = useState('Initializing analysis...');
+  const { isRealData } = useDataSource();
   
   // Function to update progress during loading
   const updateProgress = useCallback(() => {
@@ -68,6 +70,13 @@ const AIInsights = () => {
   }, []);
   
   const fetchInsights = useCallback(async () => {
+    // If in live data mode and no real data is available yet, don't fetch
+    if (isRealData) {
+      setInsights(null);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setInsights(null);
@@ -86,7 +95,7 @@ const AIInsights = () => {
         setTimeout(() => reject(new Error('Request timed out. The server took too long to respond.')), 30000);
       });
       
-      // Call the AI service with timeout
+      // Call the AI service with timeout - only use example data in demo mode
       const result = await Promise.race([
         aiService.generateAIInsights(exampleVenueData),
         timeoutPromise
@@ -132,12 +141,11 @@ const AIInsights = () => {
       clearInterval(progressInterval);
       setLoading(false);
     }
-  }, [updateProgress]);
+  }, [updateProgress, isRealData]);
   
   useEffect(() => {
     fetchInsights();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchInsights]);
   
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
@@ -359,6 +367,35 @@ const AIInsights = () => {
   
   // Render when no insights
   if (!insights) {
+    if (isRealData) {
+      return (
+        <div className="space-y-6 bg-gray-100 dark:bg-gray-900 p-4">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">AI Insights</h1>
+          </div>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-8">
+            <div className="text-center text-gray-500 dark:text-gray-400">
+              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">No AI insights available</h3>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                AI-powered insights will be generated once we start receiving live data from your venue.
+              </p>
+              <div className="mt-6">
+                <button
+                  type="button"
+                  className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                  onClick={() => window.location.href = '/venue-profile'}
+                >
+                  Set Up Venue Profile
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
     return (
       <Box sx={{ p: 4, textAlign: 'center' }}>
         <Typography variant="h5" fontWeight="bold" gutterBottom>Bondfyr AI Insights</Typography>
